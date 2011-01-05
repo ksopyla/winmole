@@ -7,8 +7,8 @@
         MinHeight="100"
         MinWidth="100"
         Width="Auto"
-        Padding="10"
-        AllowsTransparency="True" WindowStyle="None" Background="Transparent"
+        Padding="0"
+        AllowsTransparency="True" WindowStyle="None" Background="SkyBlue"
         Top="0"
         Left="0"
         SizeToContent="WidthAndHeight"
@@ -26,29 +26,13 @@
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
 
-        <!--Simple data template for Items-->
-        <DataTemplate x:Key="itemsTemplate">
-
-            <!-- SnapsToDevicPixels and UseLayoutRounding thanks to this 
-                doubbled borders disappear
-            -->
-            <Border Background="Black" Opacity="0.9" SnapsToDevicePixels="True" UseLayoutRounding="True" 
-                    HorizontalAlignment="Left" CornerRadius="0,2,2,0"
-                    Padding="0" Margin="0">
-                <TextBlock Text="{Binding Path=Title}"
-                       TextWrapping="Wrap"
-                       FontFamily="Georgia" FontSize="30"
-                       Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Stretch"
-                       TextAlignment="Left" Padding="0" Margin="0" Foreground="Yellow"/>
-            </Border>
-
-        </DataTemplate>
+       
     </Window.Resources>
 
     <DockPanel>
         <Border Background="Black" CornerRadius="0,0,15,0" DockPanel.Dock="Top" 
-            BorderBrush="{StaticResource DarkBorderBrush}" BorderThickness="0,0,3,3" Opacity="0.85"
-                Width="Auto" HorizontalAlignment="Left"
+            BorderBrush="Black" BorderThickness="0" Opacity="0.85"
+                Width="Auto" HorizontalAlignment="Left" UseLayoutRounding="True" SnapsToDevicePixels="True"
                 >
             <TextBox Name="tbCommand" 
                 Foreground="White" Background="Black" 
@@ -56,7 +40,7 @@
                      HorizontalAlignment="Left" BorderThickness="0"
                      VerticalAlignment="Center" 
                      TextWrapping="Wrap" 
-                     TextAlignment="Left" Padding="8" Margin="2,1,18,2"
+                     TextAlignment="Left" Padding="8" Margin="2,2,18,2"
                      KeyUp="TextBox_KeyUp" 
                      TextChanged="tbCommand_TextChanged"
                      TextInput="tbCommand_TextInput"
@@ -65,17 +49,16 @@
                      >Type a command!</TextBox>
         </Border>
 
+        <!--ItemTemplate="{StaticResource PromptItemsTemplate}"-->
         <ListBox DockPanel.Dock="Bottom" Name="itcPrompt"  
                   Background="Transparent" BorderThickness="0"
-                  Margin="0" Padding="0"
+                  Margin="-1,-1,0,0" Padding="0"
                   ItemsSource="{Binding ElementName=hostWindow, Path=DataItems}"
-                  ItemTemplate="{StaticResource itemsTemplate}"
+                  
+                 ItemContainerStyle="{StaticResource ContainerStyle}"
+                 
             >
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Padding" Value="0"/>
-                </Style>
-            </ListBox.ItemContainerStyle>
+            
         </ListBox>
 
     </DockPanel>
