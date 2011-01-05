@@ -1,0 +1,83 @@
+﻿<Window x:Class="winmole.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" 
+        x:Name="hostWindow"
+        Height="Auto"
+        MinHeight="100"
+        MinWidth="100"
+        Width="Auto"
+        Padding="10"
+        AllowsTransparency="True" WindowStyle="None" Background="Transparent"
+        Top="0"
+        Left="0"
+        SizeToContent="WidthAndHeight"
+        Topmost="True"
+        Loaded="Window_Loaded"
+        KeyUp="Window_KeyUp" 
+        >
+    <Window.Resources>
+        <LinearGradientBrush x:Key="DarkBorderBrush" StartPoint="0,0" EndPoint="0,1">
+            <LinearGradientBrush.GradientStops>
+                <GradientStopCollection>
+                    <GradientStop Color="#363636" Offset="0.0"/>
+                    <GradientStop Color="#000000" Offset="1.0"/>
+                </GradientStopCollection>
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+
+        <!--Simple data template for Items-->
+        <DataTemplate x:Key="itemsTemplate">
+
+            <!-- SnapsToDevicPixels and UseLayoutRounding thanks to this 
+                doubbled borders disappear
+            -->
+            <Border Background="Black" Opacity="0.9" SnapsToDevicePixels="True" UseLayoutRounding="True" 
+                    HorizontalAlignment="Left" CornerRadius="0,2,2,0"
+                    Padding="0" Margin="0">
+                <TextBlock Text="{Binding Path=Title}"
+                       TextWrapping="Wrap"
+                       FontFamily="Georgia" FontSize="30"
+                       Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                       TextAlignment="Left" Padding="0" Margin="0" Foreground="Yellow"/>
+            </Border>
+
+        </DataTemplate>
+    </Window.Resources>
+
+    <DockPanel>
+        <Border Background="Black" CornerRadius="0,0,15,0" DockPanel.Dock="Top" 
+            BorderBrush="{StaticResource DarkBorderBrush}" BorderThickness="0,0,3,3" Opacity="0.85"
+                Width="Auto" HorizontalAlignment="Left"
+                >
+            <TextBox Name="tbCommand" 
+                Foreground="White" Background="Black" 
+                     FontFamily="Georgia" FontSize="44"  
+                     HorizontalAlignment="Left" BorderThickness="0"
+                     VerticalAlignment="Center" 
+                     TextWrapping="Wrap" 
+                     TextAlignment="Left" Padding="8" Margin="2,1,18,2"
+                     KeyUp="TextBox_KeyUp" 
+                     TextChanged="tbCommand_TextChanged"
+                     TextInput="tbCommand_TextInput"
+                     PreviewKeyDown="tbCommand_PreviewKeyDown"
+                     PreviewKeyUp="tbCommand_PreviewKeyUp"
+                     >Type a command!</TextBox>
+        </Border>
+
+        <ListBox DockPanel.Dock="Bottom" Name="itcPrompt"  
+                  Background="Transparent" BorderThickness="0"
+                  Margin="0" Padding="0"
+                  ItemsSource="{Binding ElementName=hostWindow, Path=DataItems}"
+                  ItemTemplate="{StaticResource itemsTemplate}"
+            >
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="0"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+
+    </DockPanel>
+
+</Window>
