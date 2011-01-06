@@ -8,13 +8,15 @@
         MinWidth="100"
         Width="Auto"
         Padding="0"
-        AllowsTransparency="True" WindowStyle="None" Background="SkyBlue"
+        AllowsTransparency="True" WindowStyle="None" Background="Transparent"
+        
         Top="0"
         Left="0"
         SizeToContent="WidthAndHeight"
         Topmost="True"
         Loaded="Window_Loaded"
         KeyUp="Window_KeyUp" 
+        
         >
     <Window.Resources>
         <LinearGradientBrush x:Key="DarkBorderBrush" StartPoint="0,0" EndPoint="0,1">
@@ -43,23 +45,21 @@
                      TextAlignment="Left" Padding="8" Margin="2,2,18,2"
                      KeyUp="TextBox_KeyUp" 
                      TextChanged="tbCommand_TextChanged"
-                     TextInput="tbCommand_TextInput"
                      PreviewKeyDown="tbCommand_PreviewKeyDown"
                      PreviewKeyUp="tbCommand_PreviewKeyUp"
                      >Type a command!</TextBox>
         </Border>
 
         <!--ItemTemplate="{StaticResource PromptItemsTemplate}"-->
-        <ListBox DockPanel.Dock="Bottom" Name="itcPrompt"  
+        <ListBox  DockPanel.Dock="Bottom" Name="itcPrompt"  
                   Background="Transparent" BorderThickness="0"
                   Margin="-1,-1,0,0" Padding="0"
                   ItemsSource="{Binding ElementName=hostWindow, Path=DataItems}"
+                  ItemContainerStyle="{StaticResource ContainerStyle}"
                   
-                 ItemContainerStyle="{StaticResource ContainerStyle}"
-                 
-            >
+                  PreviewKeyDown="itcPrompt_PreviewKeyDown"
+            />
             
-        </ListBox>
 
     </DockPanel>
 

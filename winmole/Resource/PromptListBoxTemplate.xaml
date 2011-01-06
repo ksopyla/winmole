@@ -18,7 +18,7 @@
         <Border x:Name="oneListBoxItemBd" Background="Black" Opacity="0.85" 
                 SnapsToDevicePixels="True" UseLayoutRounding="True" 
                 HorizontalAlignment="Left" CornerRadius="0,2,2,0"
-                Padding="2,1,5,1" Margin="0">
+                Padding="5" Margin="0">
             <Border.Style>
                 <Style>
                     <Style.Setters>
@@ -36,7 +36,7 @@
                        TextWrapping="Wrap"
                        FontFamily="Georgia" FontSize="30"
                        Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Stretch"
-                       TextAlignment="Left" Padding="0" Margin="0" Foreground="Yellow"/>
+                       TextAlignment="Left" Padding="0" Margin="0" Foreground="YellowGreen"/>
         </Border>
         <!--
         <DataTemplate.Triggers>
@@ -53,10 +53,10 @@
         <!-- SnapsToDevicPixels and UseLayoutRounding thanks to this 
                 doubbled borders disappear
             -->
-        <Border Background="Gray" Opacity="0.85" 
+        <Border Background="Black" Opacity="0.85"
                 SnapsToDevicePixels="True" UseLayoutRounding="True" 
                 HorizontalAlignment="Left" CornerRadius="0,2,2,0"
-                Padding="2,1,5,1" Margin="0">
+                Padding="5" Margin="0">
             
             <TextBlock Text="{Binding Path=Title}"
                        TextWrapping="Wrap"

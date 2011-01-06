@@ -71,8 +71,24 @@ namespace winmole
 
             if (e.Key == Key.Down && itcPrompt.Items.Count>0)
             {
-                itcPrompt.Focus();
-                itcPrompt.SelectedIndex = 0;
+              //  itcPrompt.Focus();
+
+              // itcPrompt.SelectedIndex = itcPrompt.SelectedIndex+1;
+
+                //if (itcPrompt.SelectedIndex < 0)
+                //    itcPrompt.SelectedIndex = 0;
+                if (itcPrompt.SelectedIndex > -1)
+                {
+                    ListBoxItem lbi = itcPrompt.ItemContainerGenerator.ContainerFromIndex(itcPrompt.SelectedIndex) as ListBoxItem;
+                    if (lbi != null)
+                    {
+                        lbi.Focus();
+                    }
+                }
+                else
+                    itcPrompt.Focus();
+                //itcPrompt.SelectedIndex = itcPrompt.SelectedIndex + 1;
+                
             }
             
 
@@ -95,8 +111,13 @@ namespace winmole
 
         private void tbCommand_TextChanged(object sender, TextChangedEventArgs e)
         {
-             string cmd = tbCommand.Text;
+            string cmd = tbCommand.Text;
             
+
+            //find command type
+
+
+
             if (directoryPatrrern.IsMatch(cmd))
             {
                 DirectoryInfo drInfo = new DirectoryInfo(cmd);
@@ -119,9 +140,47 @@ namespace winmole
                 dataItems.Clear();
         }
 
-        private void tbCommand_TextInput(object sender, TextCompositionEventArgs e)
+        private void itcPrompt_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (!IsNotEditingKey(e))
+            {
+                tbCommand.Focus();
+                tbCommand.SelectionStart = tbCommand.Text.Length;
+            }
 
         }
+
+        /// <summary>
+        /// Check if key is 
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private static bool IsNotEditingKey(KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Up:
+                case Key.Down:
+                case Key.PageDown:
+                case Key.PageUp:
+                case Key.Home:
+                case Key.End:
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void itcPrompt_GotFocus(object sender, RoutedEventArgs e)
+        {
+            string source = e.OriginalSource.ToString();
+            var arr = source.Split(new char[]{' '});
+            source = arr[0];
+            int p = source.LastIndexOf(".");
+            source = source.Substring(p);
+
+        }
+
+       
     }
 }
