@@ -57,9 +57,14 @@
                   ItemsSource="{Binding ElementName=hostWindow, Path=DataItems}"
                   ItemContainerStyle="{StaticResource ContainerStyle}"
                   
+                  SelectionChanged="itcPrompt_SelectionChanged"
+                  TextInput="itcPrompt_TextInput"
+                  KeyUp="itcPrompt_KeyUp"
                   PreviewKeyDown="itcPrompt_PreviewKeyDown"
-            />
-            
+                  PreviewKeyUp="itcPrompt_PreviewKeyUp"
+            >
+        </ListBox>
+
 
     </DockPanel>
 

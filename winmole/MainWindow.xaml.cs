@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace winmole
 {
@@ -147,6 +148,14 @@ namespace winmole
                 tbCommand.Focus();
                 tbCommand.SelectionStart = tbCommand.Text.Length;
             }
+            else if (e.Key == Key.Return)
+            {
+                Prompt pr = itcPrompt.SelectedValue as Prompt;
+                if(pr!=null)
+                Process.Start(pr.ExecutePath);
+                tbCommand.Text = "";
+                //this.Hide();
+            }
 
         }
 
@@ -165,6 +174,7 @@ namespace winmole
                 case Key.PageUp:
                 case Key.Home:
                 case Key.End:
+                case Key.Return:
                     return true;
             }
 
@@ -178,6 +188,26 @@ namespace winmole
             source = arr[0];
             int p = source.LastIndexOf(".");
             source = source.Substring(p);
+
+        }
+
+        private void itcPrompt_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void itcPrompt_TextInput(object sender, TextCompositionEventArgs e)
+        {
+
+        }
+
+        private void itcPrompt_KeyUp(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void itcPrompt_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
 
         }
 
