@@ -15,7 +15,7 @@
         SizeToContent="WidthAndHeight"
         Topmost="True"
         Loaded="Window_Loaded"
-        KeyUp="Window_KeyUp" 
+        PreviewKeyDown="hostWindow_PreviewKeyDown"
         
         >
     <Window.Resources>
@@ -43,7 +43,6 @@
                      VerticalAlignment="Center" 
                      TextWrapping="Wrap" 
                      TextAlignment="Left" Padding="8" Margin="2,2,18,2"
-                     KeyUp="TextBox_KeyUp" 
                      TextChanged="tbCommand_TextChanged"
                      PreviewKeyDown="tbCommand_PreviewKeyDown"
                      PreviewKeyUp="tbCommand_PreviewKeyUp"
@@ -57,11 +56,7 @@
                   ItemsSource="{Binding ElementName=hostWindow, Path=DataItems}"
                   ItemContainerStyle="{StaticResource ContainerStyle}"
                   
-                  SelectionChanged="itcPrompt_SelectionChanged"
-                  TextInput="itcPrompt_TextInput"
-                  KeyUp="itcPrompt_KeyUp"
                   PreviewKeyDown="itcPrompt_PreviewKeyDown"
-                  PreviewKeyUp="itcPrompt_PreviewKeyUp"
             >
         </ListBox>
 

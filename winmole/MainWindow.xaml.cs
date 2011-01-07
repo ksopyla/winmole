@@ -50,11 +50,7 @@ namespace winmole
 
         }
 
-        private void TextBox_KeyUp(object sender, KeyEventArgs e)
-        {
-           
-           
-        }
+       
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -64,10 +60,14 @@ namespace winmole
 
         private void tbCommand_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            Debug.WriteLine("--->tbCommand_PreviewKeyDown " + e.OriginalSource);
+
             if (!startTyping)
             {
                 tbCommand.Text = "";
                 startTyping = true;
+               // e.Handled = true;
+                return;
             }
 
             if (e.Key == Key.Down && itcPrompt.Items.Count>0)
@@ -97,6 +97,8 @@ namespace winmole
 
         private void tbCommand_PreviewKeyUp(object sender, KeyEventArgs e)
         {
+            Debug.WriteLine("--->tbCommand_PreviewKeyUp " + e.OriginalSource);
+
             if (string.IsNullOrWhiteSpace(tbCommand.Text))
             {
                 startTyping = false;
@@ -104,21 +106,22 @@ namespace winmole
             }
         }
 
-        private void Window_KeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-                Close();
-        }
 
         private void tbCommand_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string cmd = tbCommand.Text;
+            Debug.WriteLine("--->tbCommand_TextChanged " + e.OriginalSource);
             
-
+            
+            string cmd = tbCommand.Text;
+            if (string.IsNullOrEmpty(cmd))
+            {
+                e.Handled = true;
+                return;
+            }
             //find command type
 
 
-
+            //temporary find match directory
             if (directoryPatrrern.IsMatch(cmd))
             {
                 DirectoryInfo drInfo = new DirectoryInfo(cmd);
@@ -143,6 +146,8 @@ namespace winmole
 
         private void itcPrompt_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            Debug.WriteLine("---->itcPrompt_previewKeyDown " + e.OriginalSource);
+
             if (!IsNotEditingKey(e))
             {
                 tbCommand.Focus();
@@ -181,36 +186,17 @@ namespace winmole
             return false;
         }
 
-        private void itcPrompt_GotFocus(object sender, RoutedEventArgs e)
-        {
-            string source = e.OriginalSource.ToString();
-            var arr = source.Split(new char[]{' '});
-            source = arr[0];
-            int p = source.LastIndexOf(".");
-            source = source.Substring(p);
-
-        }
-
-        private void itcPrompt_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        private void itcPrompt_TextInput(object sender, TextCompositionEventArgs e)
-        {
-
-        }
-
-        private void itcPrompt_KeyUp(object sender, KeyEventArgs e)
-        {
-
-        }
-
-        private void itcPrompt_PreviewKeyUp(object sender, KeyEventArgs e)
-        {
-
-        }
-
        
+        private void hostWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            Debug.WriteLine("-->hostWindow_previewKeyUp " + e.OriginalSource);
+            if (e.Key == Key.Escape)
+            {
+                e.Handled = true;
+                Close();
+            }
+        }
+
+              
     }
 }
