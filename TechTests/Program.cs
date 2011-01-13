@@ -24,35 +24,21 @@ namespace TechTests
 
         public static List<DocProperties> StartPrograms = new List<DocProperties>(32);
         private static DirectoryInfo INDEX_DIR = new DirectoryInfo(@"d:\winmoleIndex");
+        
+        static string systemStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
+        static string userStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
 
         static void Main(string[] args)
         {
-            var systemStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu);
-            var userStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
-
-
-            Console.WriteLine("find programs");
-
-            FindPorgrams(userStartMenuPath);
-            FindPorgrams(systemStartMenuPath);
-
-
-            Console.Write("Indexing to directory '" + INDEX_DIR + "'...");
-            Stopwatch stw = new Stopwatch();
-            stw.Start();
             LuceneStore.Directory indexDir = LuceneStore.FSDirectory.Open(INDEX_DIR);
             Analyzer analyzer = new StandardAnalyzer(LuceneUtil.Version.LUCENE_29);
-            
-            IndexWriter writer = new IndexWriter(indexDir,analyzer , true, IndexWriter.MaxFieldLength.LIMITED);
 
+            var lastAccess = INDEX_DIR.LastAccessTime;
 
-            AddToIndex(writer);
-            Console.WriteLine(" takes {0} ", stw.Elapsed);
-            stw.Restart();
-            Console.Write("Optimizing...");
-            writer.Optimize();
-            writer.Close();
-            Console.WriteLine(" takes {0}", stw.Elapsed);
+            if (lastAccess.AddMinutes(10) < DateTime.Now)
+            {
+                IndexPrograms(indexDir, analyzer);
+            }
 
             IndexReader reader = IndexReader.Open(LuceneStore.FSDirectory.Open(INDEX_DIR), true); // only searching, so read-only=true
 
@@ -62,6 +48,8 @@ namespace TechTests
             Stopwatch stwQuery = new Stopwatch();
 
             var endkey = new ConsoleKeyInfo('q', ConsoleKey.Q,false,false,false);
+
+            Console.WriteLine("Press q-key for end, another key for searching");
 
             while (Console.ReadKey() != endkey)
             {
@@ -108,7 +96,7 @@ namespace TechTests
 
                 }
 
-                Console.WriteLine("\n q - ends ");
+                Console.WriteLine("\n Press q-key for end, another key for searching");
 
             }
 
@@ -116,6 +104,30 @@ namespace TechTests
             reader.Close();
 
             Console.ReadKey();
+        }
+
+        private static void IndexPrograms(LuceneStore.Directory indexDir, Analyzer analyzer)
+        {
+            Console.WriteLine("find programs");
+ Stopwatch stw = new Stopwatch();
+            stw.Start();
+
+            FindPorgrams(userStartMenuPath);
+            FindPorgrams(systemStartMenuPath);
+            Console.WriteLine("find takes {0}", stw.Elapsed);
+            Console.Write("Indexing to directory '" + INDEX_DIR + "'...");
+
+            stw.Restart();
+
+            IndexWriter writer = new IndexWriter(indexDir, analyzer, true, IndexWriter.MaxFieldLength.LIMITED);
+
+            AddToIndex(writer);
+            Console.WriteLine(" takes {0} ", stw.Elapsed);
+            stw.Restart();
+            Console.Write("Optimizing...");
+            writer.Optimize();
+            writer.Close();
+            Console.WriteLine(" takes {0}", stw.Elapsed);
         }
 
         /// <summary>
