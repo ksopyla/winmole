@@ -15,6 +15,7 @@ using System.IO;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace winmole
 {
@@ -24,6 +25,10 @@ namespace winmole
     public partial class MainWindow : Window
     {
         Regex directoryPatrrern = new Regex(@"^(\w\:\\)");
+
+
+      
+
 
         private ObservableCollection<Prompt> dataItems;
 
@@ -42,19 +47,56 @@ namespace winmole
         bool startTyping = false;
         private string typeACommandString="Type a command!";
 
+        IndexingService indexer;
+
+        SearchService searcher;
+
+        DispatcherTimer timer;
+
+
         public MainWindow()
         {
+
+            Debug.Listeners.Add(new ConsoleTraceListener());
             dataItems = new ObservableCollection<Prompt>();
+
+
+            indexer = new IndexingService();
+            searcher = new SearchService();
+
 
             InitializeComponent();
 
+
+
+            //timer = new DispatcherTimer();
+            //timer.Interval = TimeSpan.FromSeconds(15);
+            //timer.Tick += new EventHandler(timer_Tick);
+            //timer.Start();
+            
+
         }
+
+        //void timer_Tick(object sender, EventArgs e)
+        //{
+
+        //    tblIndexing.Visibility = Visibility.Visible;
+        //    System.Threading.Thread.Sleep(5 * 1000);
+        //    tblIndexing.Visibility = Visibility.Collapsed;
+        //}
+
+       
 
        
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
            // Width = tbCommand.Width;
+
+            indexer.BuildIndex();
+
+
+
             tbCommand.Focus();
         }
 
@@ -110,7 +152,9 @@ namespace winmole
         private void tbCommand_TextChanged(object sender, TextChangedEventArgs e)
         {
             Debug.WriteLine("--->tbCommand_TextChanged " + e.OriginalSource);
-            
+
+            if (!startTyping)
+                return;
             
             string cmd = tbCommand.Text;
             if (string.IsNullOrEmpty(cmd))
@@ -121,27 +165,39 @@ namespace winmole
             //find command type
 
 
-            //temporary find match directory
-            if (directoryPatrrern.IsMatch(cmd))
+            var items =  searcher.Search(tbCommand.Text);
+            if (items.Count > 0)
             {
-                DirectoryInfo drInfo = new DirectoryInfo(cmd);
-                if (drInfo.Exists)
+                dataItems.Clear();
+
+                foreach (var item in items)
                 {
-                    var folders = (from f in drInfo.GetDirectories()
-                                   select new Prompt(f.FullName)).Take(15);
+                    dataItems.Add(item);
+                }
+            
+            }
 
-                    dataItems.Clear();
+            //temporary find match directory
+            //if (directoryPatrrern.IsMatch(cmd))
+            //{
+            //    DirectoryInfo drInfo = new DirectoryInfo(cmd);
+            //    if (drInfo.Exists)
+            //    {
+            //        var folders = (from f in drInfo.GetDirectories()
+            //                       select new Prompt(f.FullName)).Take(15);
 
-                    foreach (var item in folders)
-                    {
-                        dataItems.Add(item);
-                    }
+            //        dataItems.Clear();
+
+            //        foreach (var item in folders)
+            //        {
+            //            dataItems.Add(item);
+            //        }
 
                     
-                }
-            }
-            else
-                dataItems.Clear();
+            //    }
+            //}
+            //else
+            //    dataItems.Clear();
         }
 
         private void itcPrompt_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -179,7 +235,6 @@ namespace winmole
                 case Key.PageUp:
                 case Key.Home:
                 case Key.End:
-                case Key.Return:
                     return true;
             }
 
@@ -197,6 +252,14 @@ namespace winmole
             }
         }
 
+
+        protected override void OnClosed(EventArgs e)
+        {
+            searcher.Dispose();
+            indexer.Dispose();
+
+            base.OnClosed(e);
+        }
               
     }
 }

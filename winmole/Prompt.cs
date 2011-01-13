@@ -34,10 +34,19 @@ namespace winmole
             set;
         }
 
+        public string FullPath { get; set; }
+
         public Prompt(string title)
         {
             Title = title;
             ExecutePath = title;
+            FullPath = title;
+
+        }
+
+        public Prompt()
+        {
+            Title = "";
 
         }
 
@@ -47,5 +56,7 @@ namespace winmole
             ExecutePath = execPath;
         }
 
+
+       
     }
 }

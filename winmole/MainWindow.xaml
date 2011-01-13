@@ -18,21 +18,8 @@
         PreviewKeyDown="hostWindow_PreviewKeyDown"
         
         >
-    <Window.Resources>
-        <LinearGradientBrush x:Key="DarkBorderBrush" StartPoint="0,0" EndPoint="0,1">
-            <LinearGradientBrush.GradientStops>
-                <GradientStopCollection>
-                    <GradientStop Color="#363636" Offset="0.0"/>
-                    <GradientStop Color="#000000" Offset="1.0"/>
-                </GradientStopCollection>
-            </LinearGradientBrush.GradientStops>
-        </LinearGradientBrush>
-
-       
-    </Window.Resources>
-
-    <DockPanel>
-        <Border Background="Black" CornerRadius="0,0,15,0" DockPanel.Dock="Top" 
+   <DockPanel>
+        <Border DockPanel.Dock="Top" Background="Black" CornerRadius="0,0,15,0" 
             BorderBrush="Black" BorderThickness="0" Opacity="0.85"
                 Width="Auto" HorizontalAlignment="Left" UseLayoutRounding="True" SnapsToDevicePixels="True"
                 >
@@ -50,7 +37,7 @@
         </Border>
 
         <!--ItemTemplate="{StaticResource PromptItemsTemplate}"-->
-        <ListBox  DockPanel.Dock="Bottom" Name="itcPrompt"  
+        <ListBox DockPanel.Dock="Bottom" Name="itcPrompt"  
                   Background="Transparent" BorderThickness="0"
                   Margin="-1,-1,0,0" Padding="0"
                   ItemsSource="{Binding ElementName=hostWindow, Path=DataItems}"
@@ -59,8 +46,5 @@
                   PreviewKeyDown="itcPrompt_PreviewKeyDown"
             >
         </ListBox>
-
-
     </DockPanel>
-
 </Window>
