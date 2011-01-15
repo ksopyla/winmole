@@ -13,8 +13,9 @@ using Lucene.Net.Documents;
 using Lucene.Net.Search;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Analysis;
+using winmole.Entities;
 
-namespace winmole
+namespace winmole.Logic
 {
 
     /// <summary>
@@ -35,7 +36,7 @@ namespace winmole
         /// <summary>
         /// list with default indexed extension
         /// </summary>
-        List<string> allowedExtensions = new List<string>() { ".lnk" };
+        List<string> allowedExtensions = new List<string>() { "*.lnk" };
 
 
         /// <summary>
@@ -47,7 +48,7 @@ namespace winmole
         /// <summary>
         /// List for finded objects to index
         /// </summary>
-        List<Prompt> indexedPrompt;
+        List<PromptItem> indexedPrompt;
 
         /// <summary>
         /// Path to "Start Menu" folder for all users
@@ -59,7 +60,7 @@ namespace winmole
         /// </summary>
         string userStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
 
-        private TimeSpan IndexValidTime = TimeSpan.FromMinutes(10);
+        private TimeSpan IndexValidTime = TimeSpan.FromMinutes(1);
 
         #region Lucene fields
 
@@ -80,7 +81,7 @@ namespace winmole
 
             resolvers = new Dictionary<string, IExtensionResolver>();
             resolvers.Add("directory", new DirectoryResolver());
-            resolvers.Add(".lnk", new SystemLinkResolver());
+            resolvers.Add("*.lnk", new SystemLinkResolver());
 
         }
 
@@ -94,7 +95,7 @@ namespace winmole
 
             if (lastAccess.Add(IndexValidTime) < DateTime.Now)
             {
-                indexedPrompt = new List<Prompt>(200);
+                indexedPrompt = new List<PromptItem>(200);
                 foreach (var item in pathToIndex)
                 {
 
@@ -121,10 +122,13 @@ namespace winmole
             {
                 Document doc = new Document();
 
-                doc.Add(new Field("name", prompt.Title.ToLower(), Field.Store.YES, Field.Index.ANALYZED));
-                doc.Add(new Field("analized_path", prompt.ExecutePath.ToLower(), Field.Store.YES, Field.Index.ANALYZED));
-                doc.Add(new Field("path", prompt.ExecutePath, Field.Store.YES, Field.Index.NO));
-                doc.Add(new Field("orig_path", prompt.FullPath, Field.Store.YES, Field.Index.ANALYZED));
+                doc.Add(new Field("name", prompt.Name.ToLower(), Field.Store.YES, Field.Index.ANALYZED));
+
+                string analized = prompt.Name + " " + Path.GetFileNameWithoutExtension(prompt.TargetPath);
+
+                doc.Add(new Field("analized_path", analized.ToLower(), Field.Store.YES, Field.Index.ANALYZED));
+                doc.Add(new Field("path", prompt.FullPath, Field.Store.YES, Field.Index.NO));
+                //doc.Add(new Field("orig_path", prompt.FullPath, Field.Store.YES, Field.Index.ANALYZED));
 
                 writer.AddDocument(doc);
             }
@@ -138,18 +142,18 @@ namespace winmole
         {
 
             //1.build Promt for directory
-            IExtensionResolver res = resolvers["directory"];
+           // IExtensionResolver res = resolvers["directory"];
 
-            indexedPrompt.Add(res.BuildPrompt(basePath));
+         //   indexedPrompt.Add(res.BuildPrompt(basePath));
 
             //2. For all allowed exitensio for this directory
             foreach (var ext in extensions)
             {
-                res = resolvers[ext];
+                IExtensionResolver res = resolvers[ext];
                 //3. Find all files in direcotry
                 foreach (string file in System.IO.Directory.GetFiles(basePath, ext))
                 {
-                    indexedPrompt.Add(res.BuildPrompt(basePath));
+                    indexedPrompt.Add(res.BuildPrompt(file));
                 }
             }
 

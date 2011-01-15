@@ -13,8 +13,9 @@ using Lucene.Net.Documents;
 using Lucene.Net.Search;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Analysis;
+using winmole.Entities;
 
-namespace winmole
+namespace winmole.Logic
 {
 
     /// <summary>
@@ -41,7 +42,11 @@ namespace winmole
 
         public SearchService()
         {
-            luceneIndexDir = LuceneStore.FSDirectory.Open(INDEX_DIR);
+            var tmpluceneIndexDir = LuceneStore.FSDirectory.Open(INDEX_DIR);
+
+            luceneIndexDir = new LuceneStore.RAMDirectory(tmpluceneIndexDir);
+            tmpluceneIndexDir.Close();
+
             analyzer = new StandardAnalyzer(LuceneUtil.Version.LUCENE_29);
 
             reader = IndexReader.Open(luceneIndexDir, true); // only searching, so read-only=true
@@ -49,17 +54,23 @@ namespace winmole
             searcher = new IndexSearcher(reader);
         }
 
-        public IList<Prompt> Search(string userquery)
+        public IList<PromptItem> Search(string userquery)
         {
 
             string[] queries = new[] { userquery, userquery, userquery };
 
-            List<Prompt> searchedPrompt = new List<Prompt>(16);
+            List<PromptItem> searchedPrompt = new List<PromptItem>(16);
 
-            //QueryParser parser = new QueryParser(LuceneUtil.Version.LUCENE_29, "analized_path", analyzer);
+            QueryParser parser = new QueryParser(LuceneUtil.Version.LUCENE_29, "name", analyzer);
+            //Query query = parser.GetPrefixQuery("name", userquery);
             //Query query = parser.Parse(userquery);
+            Query query = parser.GetFuzzyQuery("name", userquery, 0.4f);
 
-            Query query = MultiFieldQueryParser.Parse(LuceneUtil.Version.LUCENE_29, queries, queryFields, analyzer);
+            //parser.SetDefaultOperator(QueryParser.Operator.AND);
+
+            //var t = new MultiFieldQueryParser()
+
+            //Query query = MultiFieldQueryParser.Parse(LuceneUtil.Version.LUCENE_29, queries, queryFields, analyzer);
 
             var tophits = searcher.Search(query, 15);
 
@@ -70,10 +81,10 @@ namespace winmole
 
                 Document doc = searcher.Doc(docId);
 
-                Prompt pr = new Prompt();
-                pr.Title = doc.GetField("name").StringValue();
-                pr.ExecutePath = doc.GetField("path").StringValue();
-                pr.FullPath = doc.GetField("orig_path").StringValue();
+                PromptItem pr = new PromptItem();
+                pr.Name = doc.GetField("name").StringValue();
+                //pr.ExecutePath = doc.GetField("path").StringValue();
+                pr.FullPath = doc.GetField("path").StringValue();
                 searchedPrompt.Add(pr);
 
             }

@@ -4,20 +4,22 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace winmole
+using winmole.Entities;
+
+namespace winmole.Logic
 {
     public interface IExtensionResolver
     {
-        Prompt BuildPrompt(string path);
+        PromptItem BuildPrompt(string path);
     }
 
 
     public class DirectoryResolver : IExtensionResolver
     {
 
-        public Prompt BuildPrompt(string path)
+        public PromptItem BuildPrompt(string path)
         {
-            return new Prompt(path, path);
+            return new PromptItem(path);
         }
     }
 
@@ -28,7 +30,7 @@ namespace winmole
 
         IWshRuntimeLibrary.WshShell shell = new IWshRuntimeLibrary.WshShell();
 
-        public Prompt BuildPrompt(string path)
+        public PromptItem BuildPrompt(string path)
         {
 
             FileInfo file = new FileInfo(path);
@@ -37,12 +39,11 @@ namespace winmole
                 throw new ArgumentException("specified file isn't link file");
 
             IWshRuntimeLibrary.WshShortcut link = shell.CreateShortcut(file.FullName) as IWshRuntimeLibrary.WshShortcut;
-            return new Prompt()
-            {
-                Title = file.Name.Substring(0, file.Name.Length - 4),
-                ExecutePath = link.TargetPath,
-                FullPath = file.FullName
-            };
+            return new PromptItem(
+                file.Name.Substring(0, file.Name.Length - 4),
+                link.TargetPath,
+                file.FullName
+            );
 
 
 

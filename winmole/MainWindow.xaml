@@ -18,8 +18,8 @@
         PreviewKeyDown="hostWindow_PreviewKeyDown"
         
         >
-   <DockPanel>
-        <Border DockPanel.Dock="Top" Background="Black" CornerRadius="0,0,15,0" 
+   <StackPanel Orientation="Vertical">
+        <Border  Background="Black" CornerRadius="0,0,15,0" 
             BorderBrush="Black" BorderThickness="0" Opacity="0.85"
                 Width="Auto" HorizontalAlignment="Left" UseLayoutRounding="True" SnapsToDevicePixels="True"
                 >
@@ -33,11 +33,11 @@
                      TextChanged="tbCommand_TextChanged"
                      PreviewKeyDown="tbCommand_PreviewKeyDown"
                      PreviewKeyUp="tbCommand_PreviewKeyUp"
-                     >Type a command!</TextBox>
+                     >Type a command!gggjjj</TextBox>
         </Border>
 
         <!--ItemTemplate="{StaticResource PromptItemsTemplate}"-->
-        <ListBox DockPanel.Dock="Bottom" Name="itcPrompt"  
+        <ListBox  Name="itcPrompt"  
                   Background="Transparent" BorderThickness="0"
                   Margin="-1,-1,0,0" Padding="0"
                   ItemsSource="{Binding ElementName=hostWindow, Path=DataItems}"
@@ -45,6 +45,7 @@
                   
                   PreviewKeyDown="itcPrompt_PreviewKeyDown"
             >
+           
         </ListBox>
-    </DockPanel>
+    </StackPanel>
 </Window>

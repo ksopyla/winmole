@@ -16,6 +16,11 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Windows.Threading;
+using System.Threading;
+using winmole.ViewModel;
+using winmole.Logic;
+using winmole.Entities;
+using System.ComponentModel;
 
 namespace winmole
 {
@@ -27,7 +32,8 @@ namespace winmole
         Regex directoryPatrrern = new Regex(@"^(\w\:\\)");
 
 
-      
+        TimeSpan lastKeyStroke = new TimeSpan();
+
 
 
         private ObservableCollection<Prompt> dataItems;
@@ -45,7 +51,7 @@ namespace winmole
         }
 
         bool startTyping = false;
-        private string typeACommandString="Type a command!";
+        private string typeACommandString = "Type a command!";
 
         IndexingService indexer;
 
@@ -53,49 +59,120 @@ namespace winmole
 
         DispatcherTimer timer;
 
+        System.Timers.Timer timer2;
+
+        System.Timers.Timer worktimer;
+
+        BackgroundWorker worker;
+
+        int intervalMs = 200;
 
         public MainWindow()
         {
-
-            Debug.Listeners.Add(new ConsoleTraceListener());
             dataItems = new ObservableCollection<Prompt>();
-
 
             indexer = new IndexingService();
             searcher = new SearchService();
 
 
+
+
+            //timer2 = new System.Timers.Timer();
+            //timer2.Interval = 100;
+            //timer2.AutoReset = false;
+            //timer2.Elapsed += new System.Timers.ElapsedEventHandler(timer2_Elapsed);
+            //timer2.Enabled = false;
+
+
+            worker = new BackgroundWorker();
+
+            worker.DoWork += new DoWorkEventHandler(worker_DoWork);
+            worker.RunWorkerCompleted+=new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
+
+
+            //worktimer = new System.Timers.Timer(100);
+            //worktimer.AutoReset = false;
+            //worktimer.Elapsed += (sender, e) =>
+            //    {
+            //        if (!worker.IsBusy)
+            //        {
+            //            worker.RunWorkerAsync(tbCommand.Text);
+            //        }
+            //    };
+            //worktimer.Enabled = false;
+
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(intervalMs);
+            timer.IsEnabled = false;
+            timer.Tick += new EventHandler(timer_Tick);
+
+
             InitializeComponent();
+            //Timer t = new Timer(
+            //    (x) => { }, "state", 200, Timeout.Infinite);
 
-
-
-            //timer = new DispatcherTimer();
-            //timer.Interval = TimeSpan.FromSeconds(15);
-            //timer.Tick += new EventHandler(timer_Tick);
-            //timer.Start();
             
 
         }
 
-        //void timer_Tick(object sender, EventArgs e)
-        //{
+        void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
 
-        //    tblIndexing.Visibility = Visibility.Visible;
-        //    System.Threading.Thread.Sleep(5 * 1000);
-        //    tblIndexing.Visibility = Visibility.Collapsed;
-        //}
+           var promptItems = e.Result as IList<PromptItem>;
+
+           Debug.WriteLine("add searching items");
+           if (promptItems.Count > 0)
+           {
+               dataItems.Clear();
+
+               foreach (var item in promptItems)
+               {
+                   //dataItems.Add(item);
+                   dataItems.Add(new Prompt() { Title = item.Name, FullPath = item.FullPath });
+               }
+           }
+           else
+               dataItems.Clear();
+
+            
+        }
+
+        void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string query = (string)e.Argument;
+            Debug.WriteLine("searching cmd= "+ query);
+            var items = searcher.Search(query);
+
+            e.Result = items;
+
+        }
 
        
+        void timer_Tick(object sender, EventArgs e)
+        {
 
-       
+            DispatcherTimer dst = sender as DispatcherTimer;
+
+            if (!worker.IsBusy)
+            {
+                Debug.WriteLine("worker run");
+                worker.RunWorkerAsync(tbCommand.Text);
+                timer.Stop();
+            }
+            else
+            {
+                Debug.WriteLine("worker busy");
+            }
+            
+        }
+
+
+
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-           // Width = tbCommand.Width;
-
             indexer.BuildIndex();
-
-
 
             tbCommand.Focus();
         }
@@ -108,18 +185,20 @@ namespace winmole
             {
                 tbCommand.Text = "";
                 startTyping = true;
-               // e.Handled = true;
+                // e.Handled = true;
                 return;
             }
 
-            if (e.Key == Key.Down && itcPrompt.Items.Count>0)
+            if (e.Key == Key.Down && itcPrompt.Items.Count > 0)
             {
-              //  itcPrompt.Focus();
+                //  itcPrompt.Focus();
 
-              // itcPrompt.SelectedIndex = itcPrompt.SelectedIndex+1;
+                // itcPrompt.SelectedIndex = itcPrompt.SelectedIndex+1;
 
                 //if (itcPrompt.SelectedIndex < 0)
                 //    itcPrompt.SelectedIndex = 0;
+                timer.Stop();
+
                 if (itcPrompt.SelectedIndex > -1)
                 {
                     ListBoxItem lbi = itcPrompt.ItemContainerGenerator.ContainerFromIndex(itcPrompt.SelectedIndex) as ListBoxItem;
@@ -131,9 +210,9 @@ namespace winmole
                 else
                     itcPrompt.Focus();
                 //itcPrompt.SelectedIndex = itcPrompt.SelectedIndex + 1;
-                
+
             }
-            
+
 
         }
 
@@ -153,29 +232,37 @@ namespace winmole
         {
             Debug.WriteLine("--->tbCommand_TextChanged " + e.OriginalSource);
 
+            //stop update prompt list
+            timer.Stop();
+
             if (!startTyping)
                 return;
-            
+
             string cmd = tbCommand.Text;
-            if (string.IsNullOrEmpty(cmd))
+            if (string.IsNullOrWhiteSpace(tbCommand.Text))
             {
-                e.Handled = true;
+                startTyping = false;
+                tbCommand.Text = typeACommandString;
+
+                dataItems.Clear();
+                //e.Handled = true;
                 return;
             }
+
+
             //find command type
 
+            var nowTime = DateTime.Now.TimeOfDay;
+            var timeKeyStroke = nowTime.Subtract(lastKeyStroke);
 
-            var items =  searcher.Search(tbCommand.Text);
-            if (items.Count > 0)
-            {
-                dataItems.Clear();
+            Debug.WriteLine("<----last key press= {0}", timeKeyStroke.Milliseconds);
 
-                foreach (var item in items)
-                {
-                    dataItems.Add(item);
-                }
-            
-            }
+            lastKeyStroke = nowTime;
+            if (cmd.Length < 2)
+                return;
+            //start timer to search
+            timer.Start();
+
 
             //temporary find match directory
             //if (directoryPatrrern.IsMatch(cmd))
@@ -193,7 +280,7 @@ namespace winmole
             //            dataItems.Add(item);
             //        }
 
-                    
+
             //    }
             //}
             //else
@@ -212,16 +299,23 @@ namespace winmole
             else if (e.Key == Key.Return)
             {
                 Prompt pr = itcPrompt.SelectedValue as Prompt;
-                if(pr!=null)
-                Process.Start(pr.ExecutePath);
+                if (pr != null)
+                {
+                    //Process.Start(pr.ExecutePath);
+                    ProcessStartInfo prInfo = new ProcessStartInfo(pr.FullPath);
+                    prInfo.UseShellExecute = true;
+                    Process.Start(prInfo);
+
+                }
                 tbCommand.Text = "";
+               // startTyping = false;
                 //this.Hide();
             }
 
         }
 
         /// <summary>
-        /// Check if key is 
+        /// Check if key is not editing key
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
@@ -235,13 +329,14 @@ namespace winmole
                 case Key.PageUp:
                 case Key.Home:
                 case Key.End:
+                case Key.Return:
                     return true;
             }
 
             return false;
         }
 
-       
+
         private void hostWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             Debug.WriteLine("-->hostWindow_previewKeyUp " + e.OriginalSource);
@@ -260,6 +355,8 @@ namespace winmole
 
             base.OnClosed(e);
         }
-              
+
+
+        
     }
 }
