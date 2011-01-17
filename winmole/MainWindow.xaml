@@ -1,7 +1,11 @@
 ﻿<Window x:Class="winmole.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" 
+        
+        xmlns:notifyIco="http://www.hardcodet.net/taskbar"
+        
+        Title="WinMole"
+        Icon="/Pictures/mole.ico"
         x:Name="hostWindow"
         Height="Auto"
         MinHeight="100"
@@ -16,8 +20,10 @@
         Topmost="True"
         Loaded="Window_Loaded"
         PreviewKeyDown="hostWindow_PreviewKeyDown"
+       
         
         >
+    <!--old deactiveted window event Deactivated="hostWindow_Deactivated" -->
    <StackPanel Orientation="Vertical">
         <Border  Background="Black" CornerRadius="0,0,15,0" 
             BorderBrush="Black" BorderThickness="0" Opacity="0.85"
@@ -33,7 +39,7 @@
                      TextChanged="tbCommand_TextChanged"
                      PreviewKeyDown="tbCommand_PreviewKeyDown"
                      PreviewKeyUp="tbCommand_PreviewKeyUp"
-                     >Type a command!gggjjj</TextBox>
+                     >Type a command!</TextBox>
         </Border>
 
         <!--ItemTemplate="{StaticResource PromptItemsTemplate}"-->
@@ -47,5 +53,20 @@
             >
            
         </ListBox>
+
+        <notifyIco:TaskbarIcon 
+            Name="trayIcon"
+            ToolTipText="Show winMole" 
+            IconSource="/Pictures/mole.ico"
+            TrayLeftMouseUp="taskbarIcon_TrayLeftMouseUp"
+            >
+            <notifyIco:TaskbarIcon.ContextMenu>
+                <ContextMenu Placement="Mouse" VerticalOffset="-10" HorizontalOffset="-10">
+                    <MenuItem Name="miShowWindow" Header="Show" Click="miShowWindow_Click"/>
+                    <MenuItem Name="miClose" Header="Close" Click="miClose_Click"/>
+
+                </ContextMenu>
+            </notifyIco:TaskbarIcon.ContextMenu>
+        </notifyIco:TaskbarIcon>
     </StackPanel>
 </Window>

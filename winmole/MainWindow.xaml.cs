@@ -87,7 +87,7 @@ namespace winmole
             worker = new BackgroundWorker();
 
             worker.DoWork += new DoWorkEventHandler(worker_DoWork);
-            worker.RunWorkerCompleted+=new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
+            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
 
 
             //worktimer = new System.Timers.Timer(100);
@@ -111,43 +111,53 @@ namespace winmole
             //Timer t = new Timer(
             //    (x) => { }, "state", 200, Timeout.Infinite);
 
-            
+
 
         }
 
         void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+dataItems.Clear();
+            if (e.Error != null)
+            {
+                MessageBox.Show(e.Error.Message);
 
-           var promptItems = e.Result as IList<PromptItem>;
+            }
 
-           Debug.WriteLine("add searching items");
-           if (promptItems.Count > 0)
-           {
-               dataItems.Clear();
+            var promptItems = e.Result as IList<PromptItem>;
 
-               foreach (var item in promptItems)
-               {
-                   //dataItems.Add(item);
-                   dataItems.Add(new Prompt() { Title = item.Name, FullPath = item.FullPath });
-               }
-           }
-           else
-               dataItems.Clear();
-
+            Debug.WriteLine("add searching items");
+            if (promptItems.Count > 0)
+            {
+                foreach (var item in promptItems)
+                {
+                    //dataItems.Add(item);
+                    dataItems.Add(new Prompt() { Title = item.Name, FullPath = item.FullPath });
+                }
+            }
             
         }
 
         void worker_DoWork(object sender, DoWorkEventArgs e)
         {
             string query = (string)e.Argument;
-            Debug.WriteLine("searching cmd= "+ query);
-            var items = searcher.Search(query);
+            Debug.WriteLine("searching cmd= " + query);
+            try
+            {
+                var items = searcher.Search(query);
 
-            e.Result = items;
+                e.Result = items;
+            }
+            catch (Exception exp)
+            {
+                throw;
+
+            }
+
 
         }
 
-       
+
         void timer_Tick(object sender, EventArgs e)
         {
 
@@ -163,7 +173,7 @@ namespace winmole
             {
                 Debug.WriteLine("worker busy");
             }
-            
+
         }
 
 
@@ -239,12 +249,9 @@ namespace winmole
                 return;
 
             string cmd = tbCommand.Text;
-            if (string.IsNullOrWhiteSpace(tbCommand.Text))
+            if (string.IsNullOrWhiteSpace(cmd))
             {
-                startTyping = false;
-                tbCommand.Text = typeACommandString;
-
-                dataItems.Clear();
+                ClearPrompt();
                 //e.Handled = true;
                 return;
             }
@@ -287,6 +294,14 @@ namespace winmole
             //    dataItems.Clear();
         }
 
+        private void ClearPrompt()
+        {
+            startTyping = false;
+            tbCommand.Text = typeACommandString;
+            tbCommand.Focus();
+            dataItems.Clear();
+        }
+
         private void itcPrompt_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             Debug.WriteLine("---->itcPrompt_previewKeyDown " + e.OriginalSource);
@@ -307,8 +322,10 @@ namespace winmole
                     Process.Start(prInfo);
 
                 }
-                tbCommand.Text = "";
-               // startTyping = false;
+
+                HideMainWindow();
+                // tbCommand.Text = "";
+                // startTyping = false;
                 //this.Hide();
             }
 
@@ -342,21 +359,70 @@ namespace winmole
             Debug.WriteLine("-->hostWindow_previewKeyUp " + e.OriginalSource);
             if (e.Key == Key.Escape)
             {
+
+                HideMainWindow();
+
                 e.Handled = true;
-                Close();
+               // Close();
             }
         }
 
+        private void HideMainWindow()
+        {
+            ClearPrompt();
+            this.Hide();
+        }
 
-        protected override void OnClosed(EventArgs e)
+
+
+        protected override void OnClosing(CancelEventArgs e)
         {
             searcher.Dispose();
             indexer.Dispose();
 
-            base.OnClosed(e);
+            trayIcon.Dispose();
+
+            base.OnClosing(e);
+        }
+
+        private void taskbarIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
+        {
+            ShowMainWindow();
+        }
+
+       
+
+        private void miShowWindow_Click(object sender, RoutedEventArgs e)
+        {
+            ShowMainWindow();
+        }
+
+        private void ShowMainWindow()
+        {
+            if (!IsVisible)
+            {
+                Show();
+            }
+
+            this.Activate();
+            tbCommand.Focus();
+        }
+
+        private void miClose_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void hostWindow_Deactivated(object sender, EventArgs e)
+        {
+
+            Debug.WriteLine("-->Deactivate window");
+            this.Activate();
+            tbCommand.Focus();
+            //HideMainWindow();
         }
 
 
-        
+       
     }
 }

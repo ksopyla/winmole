@@ -60,7 +60,7 @@ namespace winmole.Logic
         /// </summary>
         string userStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
 
-        private TimeSpan IndexValidTime = TimeSpan.FromMinutes(1);
+        private TimeSpan IndexValidTime = TimeSpan.FromMinutes(330);
 
         #region Lucene fields
 
@@ -122,13 +122,15 @@ namespace winmole.Logic
             {
                 Document doc = new Document();
 
-                doc.Add(new Field("name", prompt.Name.ToLower(), Field.Store.YES, Field.Index.ANALYZED));
+                doc.Add(new Field("name", prompt.Name.ToLower(), Field.Store.YES, Field.Index.ANALYZED,Field.TermVector.WITH_OFFSETS));
 
                 string analized = prompt.Name + " " + Path.GetFileNameWithoutExtension(prompt.TargetPath);
 
-                doc.Add(new Field("analized_path", analized.ToLower(), Field.Store.YES, Field.Index.ANALYZED));
+                
+                doc.Add(new Field("analized_path", analized.ToLower(), Field.Store.YES, Field.Index.ANALYZED,Field.TermVector.YES));
                 doc.Add(new Field("path", prompt.FullPath, Field.Store.YES, Field.Index.NO));
                 //doc.Add(new Field("orig_path", prompt.FullPath, Field.Store.YES, Field.Index.ANALYZED));
+
 
                 writer.AddDocument(doc);
             }

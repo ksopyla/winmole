@@ -30,20 +30,24 @@ namespace TechTests
 
         static void Main(string[] args)
         {
-            LuceneStore.Directory indexDir = LuceneStore.FSDirectory.Open(INDEX_DIR);
+            LuceneStore.Directory indexFSDir = LuceneStore.FSDirectory.Open(INDEX_DIR);
+
+            LuceneStore.RAMDirectory indexDir = new LuceneStore.RAMDirectory(indexFSDir);
+            
             Analyzer analyzer = new StandardAnalyzer(LuceneUtil.Version.LUCENE_29);
 
             var lastAccess = INDEX_DIR.LastAccessTime;
 
-            if (lastAccess.AddMinutes(10) < DateTime.Now)
-            {
-                IndexPrograms(indexDir, analyzer);
-            }
+            //if (lastAccess.AddMinutes(10) < DateTime.Now)
+            //{
+            //    IndexPrograms(indexDir, analyzer);
+            //}
 
-            IndexReader reader = IndexReader.Open(LuceneStore.FSDirectory.Open(INDEX_DIR), true); // only searching, so read-only=true
+            IndexReader reader = IndexReader.Open(indexDir, true); // only searching, so read-only=true
 
             
             Searcher searcher = new IndexSearcher(reader);
+            QueryParser parser = new QueryParser(LuceneUtil.Version.LUCENE_29, "analized_path", analyzer);
             string[] queryFields = new[] { "analized_path", "name", "orig_path" };
             Stopwatch stwQuery = new Stopwatch();
 
@@ -68,13 +72,15 @@ namespace TechTests
                 //Query query = parser.Parse(userquery);
 
                 stwQuery.Start();
-                Query query = MultiFieldQueryParser.Parse(LuceneUtil.Version.LUCENE_29, queries, queryFields, analyzer);
-
+                
+               // Query query = MultiFieldQueryParser.Parse(LuceneUtil.Version.LUCENE_29, queries, queryFields, analyzer);
+                parser.SetDefaultOperator(QueryParser.Operator.AND);
+                Query query = parser.Parse(userquery);
                 var tophits = searcher.Search(query, 15);
                 stwQuery.Stop();
                 
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("total number of hits {0} in {1} ms", tophits.totalHits,stwQuery.ElapsedMilliseconds);
+                Console.WriteLine("total number of hits {0} in {1} ms {2}", tophits.totalHits,stwQuery.ElapsedMilliseconds,stwQuery.Elapsed);
                 Console.ForegroundColor = ConsoleColor.White;
 
 
@@ -91,7 +97,7 @@ namespace TechTests
                     Console.WriteLine("------------------------------------------");
                     Console.WriteLine("Path= {0} ", doc.GetField("path"));
                     Console.WriteLine("Analized Path= {0} ", doc.GetField("analized_path"));
-                    Console.WriteLine("Orig Path= {0} ", doc.GetField("orig_path"));
+                    //Console.WriteLine("Orig Path= {0} ", doc.GetField("orig_path"));
 
 
                 }
