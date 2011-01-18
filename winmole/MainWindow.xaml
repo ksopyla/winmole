@@ -17,10 +17,10 @@
         Top="0"
         Left="0"
         SizeToContent="WidthAndHeight"
-        Topmost="True"
+        Topmost="False"
         Loaded="Window_Loaded"
         PreviewKeyDown="hostWindow_PreviewKeyDown"
-       
+       Deactivated="hostWindow_Deactivated"
         
         >
     <!--old deactiveted window event Deactivated="hostWindow_Deactivated" -->

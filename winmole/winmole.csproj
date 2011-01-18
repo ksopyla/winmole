@@ -6,7 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{6D594F07-F0F7-450E-9C74-C09F53538D13}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>winmole</RootNamespace>
     <AssemblyName>winmole</AssemblyName>
@@ -54,8 +54,12 @@
     <Reference Include="Lucene.Net">
       <HintPath>..\libs\Lucene.Net.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedWinapi">
+      <HintPath>..\libs\ManagedWinapi.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />

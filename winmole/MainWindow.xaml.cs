@@ -34,7 +34,7 @@ namespace winmole
 
         TimeSpan lastKeyStroke = new TimeSpan();
 
-
+       
 
         private ObservableCollection<Prompt> dataItems;
 
@@ -53,7 +53,7 @@ namespace winmole
         bool startTyping = false;
         private string typeACommandString = "Type a command!";
 
-        IndexingService indexer;
+       
 
         SearchService searcher;
 
@@ -67,12 +67,14 @@ namespace winmole
 
         int intervalMs = 200;
 
-        public MainWindow()
+
+
+        public MainWindow( SearchService searchSrv)
         {
             dataItems = new ObservableCollection<Prompt>();
 
-            indexer = new IndexingService();
-            searcher = new SearchService();
+           
+            searcher = searchSrv;
 
 
 
@@ -114,6 +116,7 @@ namespace winmole
 
 
         }
+
 
         void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -182,7 +185,7 @@ dataItems.Clear();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            indexer.BuildIndex();
+            
 
             tbCommand.Focus();
         }
@@ -234,6 +237,13 @@ dataItems.Clear();
             {
                 startTyping = false;
                 tbCommand.Text = typeACommandString;
+            }
+
+            if (e.Key == Key.Return)
+            {
+
+                Launch(0);
+
             }
         }
 
@@ -313,22 +323,34 @@ dataItems.Clear();
             }
             else if (e.Key == Key.Return)
             {
-                Prompt pr = itcPrompt.SelectedValue as Prompt;
-                if (pr != null)
-                {
-                    //Process.Start(pr.ExecutePath);
-                    ProcessStartInfo prInfo = new ProcessStartInfo(pr.FullPath);
-                    prInfo.UseShellExecute = true;
-                    Process.Start(prInfo);
+                int selectedIndex = itcPrompt.SelectedIndex;
 
-                }
-
-                HideMainWindow();
+                Launch(selectedIndex);
                 // tbCommand.Text = "";
                 // startTyping = false;
                 //this.Hide();
             }
 
+        }
+
+        private void Launch(int selectedIndex)
+        {
+
+            if (dataItems.Count <= selectedIndex)
+                return;
+
+            Prompt pr = dataItems[selectedIndex];
+
+            if (pr != null)
+            {
+                //Process.Start(pr.ExecutePath);
+                ProcessStartInfo prInfo = new ProcessStartInfo(pr.FullPath);
+                prInfo.UseShellExecute = true;
+                Process.Start(prInfo);
+
+            }
+
+            HideMainWindow();
         }
 
         /// <summary>
@@ -377,8 +399,7 @@ dataItems.Clear();
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            searcher.Dispose();
-            indexer.Dispose();
+            
 
             trayIcon.Dispose();
 
@@ -387,17 +408,19 @@ dataItems.Clear();
 
         private void taskbarIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
         {
-            ShowMainWindow();
+            ActvateMainWindow();
         }
 
        
 
         private void miShowWindow_Click(object sender, RoutedEventArgs e)
         {
-            ShowMainWindow();
+            ActvateMainWindow();
         }
 
-        private void ShowMainWindow()
+
+
+        public void ActvateMainWindow()
         {
             if (!IsVisible)
             {
@@ -406,19 +429,23 @@ dataItems.Clear();
 
             this.Activate();
             tbCommand.Focus();
+            tbCommand.SelectionStart = tbCommand.Text.Length;
         }
 
         private void miClose_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            //Close();
+            Application.Current.Shutdown();
         }
 
         private void hostWindow_Deactivated(object sender, EventArgs e)
         {
 
             Debug.WriteLine("-->Deactivate window");
-            this.Activate();
-            tbCommand.Focus();
+            this.Hide();
+
+            //this.Activate();
+            //tbCommand.Focus();
             //HideMainWindow();
         }
 
