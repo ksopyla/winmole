@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "winmole", "winmole\winmole.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechTests", "TechTests\TechTests.csproj", "{855DA4CA-A87F-4D71-8B21-E0D90C26F698}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "winmole.setup", "winmole.setup\winmole.setup.vdproj", "{2923CE8C-761B-40F8-8471-4DAC4846A1EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{855DA4CA-A87F-4D71-8B21-E0D90C26F698}.Release|Any CPU.Build.0 = Release|Any CPU
 		{855DA4CA-A87F-4D71-8B21-E0D90C26F698}.Release|x86.ActiveCfg = Release|x86
 		{855DA4CA-A87F-4D71-8B21-E0D90C26F698}.Release|x86.Build.0 = Release|x86
+		{2923CE8C-761B-40F8-8471-4DAC4846A1EF}.Debug|Any CPU.ActiveCfg = Debug
+		{2923CE8C-761B-40F8-8471-4DAC4846A1EF}.Debug|x86.ActiveCfg = Debug
+		{2923CE8C-761B-40F8-8471-4DAC4846A1EF}.Release|Any CPU.ActiveCfg = Release
+		{2923CE8C-761B-40F8-8471-4DAC4846A1EF}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
