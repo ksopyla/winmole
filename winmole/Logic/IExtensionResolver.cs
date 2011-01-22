@@ -23,6 +23,17 @@ namespace winmole.Logic
         }
     }
 
+    public class FileResolver: IExtensionResolver
+    {
+        public PromptItem BuildPrompt(string path)
+        {
+            //FileInfo file = new FileInfo(path);
+
+            string fileName=Path.GetFileName(path);
+            return new PromptItem(fileName, path, path);
+        }
+    }
+
 
     public class SystemLinkResolver : IExtensionResolver
     {

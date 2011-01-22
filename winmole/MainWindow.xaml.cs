@@ -59,9 +59,7 @@ namespace winmole
 
         DispatcherTimer timer;
 
-        System.Timers.Timer timer2;
-
-        System.Timers.Timer worktimer;
+      
 
         BackgroundWorker worker;
 
@@ -77,31 +75,10 @@ namespace winmole
             searcher = searchSrv;
 
 
-
-
-            //timer2 = new System.Timers.Timer();
-            //timer2.Interval = 100;
-            //timer2.AutoReset = false;
-            //timer2.Elapsed += new System.Timers.ElapsedEventHandler(timer2_Elapsed);
-            //timer2.Enabled = false;
-
-
             worker = new BackgroundWorker();
 
             worker.DoWork += new DoWorkEventHandler(worker_DoWork);
             worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
-
-
-            //worktimer = new System.Timers.Timer(100);
-            //worktimer.AutoReset = false;
-            //worktimer.Elapsed += (sender, e) =>
-            //    {
-            //        if (!worker.IsBusy)
-            //        {
-            //            worker.RunWorkerAsync(tbCommand.Text);
-            //        }
-            //    };
-            //worktimer.Enabled = false;
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(intervalMs);
@@ -110,17 +87,13 @@ namespace winmole
 
 
             InitializeComponent();
-            //Timer t = new Timer(
-            //    (x) => { }, "state", 200, Timeout.Infinite);
-
-
-
+           
         }
 
 
         void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-dataItems.Clear();
+            dataItems.Clear();
             if (e.Error != null)
             {
                 MessageBox.Show(e.Error.Message);
@@ -145,11 +118,42 @@ dataItems.Clear();
         {
             string query = (string)e.Argument;
             Debug.WriteLine("searching cmd= " + query);
+
+           // e.Result = new List<PromptItem>();
             try
             {
-                var items = searcher.Search(query);
 
-                e.Result = items;
+                //temporary find match directory
+                 if (directoryPatrrern.IsMatch(query))
+                 {
+                     string basePath = System.IO.Path.GetPathRoot(query);
+
+
+                     string basePath2 = System.IO.Path.GetFullPath(query);
+
+                     string basePath3 = System.IO.Path.GetDirectoryName(query);
+
+                     int dirSeparatorPos = query.LastIndexOf(System.IO.Path.DirectorySeparatorChar);
+                     string basePath4 = query.Substring(0, dirSeparatorPos+1);
+
+                     string startDirName = query.Substring(dirSeparatorPos + 1);
+
+                     DirectoryInfo drInfo = new DirectoryInfo(basePath4);
+                     if (drInfo.Exists)
+                     {
+                         var folders = (from f in drInfo.GetDirectories(startDirName+"*")
+                                        orderby f.Name ascending
+                                        select new PromptItem(f.FullName)).Take(15).ToList();
+                         
+                         e.Result = folders;
+                     }
+                 }
+                 else
+                 {
+                     var items = searcher.Search(query);
+                     e.Result = items;
+                 }
+                
             }
             catch (Exception exp)
             {
@@ -241,12 +245,16 @@ dataItems.Clear();
 
             if (e.Key == Key.Return)
             {
-
                 Launch(0);
 
             }
-        }
 
+            //if(e.Key == Key.Tab){
+
+            //    CompletePrompt(0);
+
+            //}
+        }
 
         private void tbCommand_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -330,11 +338,19 @@ dataItems.Clear();
                 // startTyping = false;
                 //this.Hide();
             }
+           
+            if (e.Key == Key.Tab)
+            {
+                int selectedIndex = itcPrompt.SelectedIndex;
+
+                CompletePrompt(selectedIndex);
+            }
 
         }
 
         private void Launch(int selectedIndex)
         {
+
 
             if (dataItems.Count <= selectedIndex)
                 return;
@@ -351,6 +367,22 @@ dataItems.Clear();
             }
 
             HideMainWindow();
+        }
+
+        private void CompletePrompt(int selectedIndex)
+        {
+            if (dataItems.Count <= selectedIndex)
+                return;
+
+             Prompt pr = dataItems[selectedIndex];
+
+             if (pr != null)
+             {
+                 tbCommand.Text = pr.Title;
+                 tbCommand.SelectionStart = pr.Title.Length;
+                 tbCommand.Focus();
+             }
+
         }
 
         /// <summary>
@@ -386,6 +418,18 @@ dataItems.Clear();
 
                 e.Handled = true;
                // Close();
+            }
+            if (e.Key == Key.Tab)
+            {
+                if (itcPrompt.SelectedIndex > -1)
+                {
+                    CompletePrompt(itcPrompt.SelectedIndex);
+                }
+                else
+                {
+                    CompletePrompt(0);
+                }
+                e.Handled = true;
             }
         }
 

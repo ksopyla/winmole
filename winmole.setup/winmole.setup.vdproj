@@ -70,12 +70,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_853D9394D51CE3CD6B9DD42EA13B114A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_25322FF7FD7E4E5586E0914A718F7E8E"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -89,6 +83,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_A4D67A6B5CBFB907DC94177AA00D9694"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_853D9394D51CE3CD6B9DD42EA13B114A"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -109,6 +109,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -125,6 +133,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -403,15 +419,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:winMole"
-        "ProductCode" = "8:{523CD6DD-0976-465A-B53C-A3782E6E697F}"
-        "PackageCode" = "8:{77784180-F014-4628-A867-A750015DC3EB}"
+        "ProductCode" = "8:{0C09C9AC-19EE-4F84-A4F4-D3442B3AFAFC}"
+        "PackageCode" = "8:{23CE1254-EA77-4417-B417-C481B17DDB63}"
         "UpgradeCode" = "8:{51D9B44F-EF7A-4BE8-A1DB-5B3EC3B2057B}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:0.2.0"
+        "ProductVersion" = "8:0.2.1"
         "Manufacturer" = "8:ksirg"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1034,7 +1050,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_25322FF7FD7E4E5586E0914A718F7E8E"
             {
-            "SourcePath" = "8:..\\winmole\\obj\\Release\\winmole.exe"
+            "SourcePath" = "8:..\\winmole\\obj\\Debug\\winmole.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CB1C7DB2CA6D469CB2CFB387BF2B9B40"

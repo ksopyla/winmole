@@ -36,7 +36,7 @@ namespace winmole.Logic
         /// <summary>
         /// list with default indexed extension
         /// </summary>
-        List<string> allowedExtensions = new List<string>() { "*.lnk" };
+        List<string> allowedExtensions = new List<string>() { "lnk" };
 
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace winmole.Logic
         /// </summary>
         string userStartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
 
-        private TimeSpan IndexValidTime = TimeSpan.FromMinutes(330);
+        private TimeSpan IndexValidTime = TimeSpan.FromMinutes(30);
 
         #region Lucene fields
 
@@ -81,7 +81,32 @@ namespace winmole.Logic
 
             resolvers = new Dictionary<string, IExtensionResolver>();
             resolvers.Add("directory", new DirectoryResolver());
-            resolvers.Add("*.lnk", new SystemLinkResolver());
+            resolvers.Add("lnk", new SystemLinkResolver());
+            resolvers.Add("pdf", new FileResolver());
+            resolvers.Add("docx", new FileResolver());
+            resolvers.Add("xlsx", new FileResolver());
+            resolvers.Add("pptx", new FileResolver());
+
+        }
+
+        public IndexingService(ICollection<KeyValuePair<string,List<string> >> pathsAndExtensions):this()
+        {
+            
+
+            foreach (var item in pathsAndExtensions)
+            {
+
+                foreach (var extenstion in item.Value)
+                {
+                    if (!resolvers.ContainsKey(extenstion))
+                    {
+                        throw new ArgumentException(string.Format("{0} is not allowed file extensions. Good extensions are pdf,docx,xlsx,pptx."));
+                    }
+                }
+                pathToIndex.Add(item.Key, item.Value);
+
+            }
+
 
         }
 
@@ -153,7 +178,7 @@ namespace winmole.Logic
             {
                 IExtensionResolver res = resolvers[ext];
                 //3. Find all files in direcotry
-                foreach (string file in System.IO.Directory.GetFiles(basePath, ext))
+                foreach (string file in System.IO.Directory.GetFiles(basePath, "*."+ext))
                 {
                     indexedPrompt.Add(res.BuildPrompt(file));
                 }

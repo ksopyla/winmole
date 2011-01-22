@@ -45,7 +45,13 @@ namespace winmole
             }
 
 
-            indexer = new IndexingService();
+            var paths = winmole.Properties.Settings.Default.IndexedPaths;
+
+            ICollection<KeyValuePair<string, List<string>>> pathsAndExt = TransofrmSettingsPaths(paths);
+
+
+            indexer = new IndexingService(pathsAndExt);
+
             searcher = new SearchService();
             mainWindow = new MainWindow(searcher);
 
@@ -57,6 +63,35 @@ namespace winmole
             {
                 ShowMainWindow();
             }
+        }
+
+        private ICollection<KeyValuePair<string, List<string>>> TransofrmSettingsPaths(System.Collections.Specialized.StringCollection paths)
+        {
+
+            List<KeyValuePair<string, List<string>>> pathsAndExt = new List<KeyValuePair<string, List<string>>>(paths.Count);
+
+
+            foreach (var item in paths)
+            {
+                int spacePos = item.IndexOf("|");
+                string path = item.Substring(0, spacePos);
+                path = path.Trim();
+
+                string ext = item.Substring(spacePos+1);
+                var extArr = ext.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                for (int i = 0; i < extArr.Length; i++)
+                {
+                    extArr[i] = extArr[i].Trim();
+                }
+
+
+                pathsAndExt.Add(new KeyValuePair<string, List<string>>(path, extArr.ToList()));
+
+            }
+
+
+            return pathsAndExt;
         }
 
         void hotKey_HotkeyPressed(object sender, EventArgs e)

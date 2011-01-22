@@ -47,6 +47,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Pictures\mole.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification">
       <HintPath>..\libs\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
